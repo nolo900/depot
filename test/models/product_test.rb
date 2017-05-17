@@ -30,7 +30,7 @@ class ProductTest < ActiveSupport::TestCase
                 price: 1)
   end
 
-  test "image url" do
+  test "image url extension format is correct" do
     ok = %w{ fred.gif fred.jpg fred.png FRED.JPG FRED.Jpg
              http://a.b.c/x/y/z/fred.gif }
     bad = %w{ fred.doc fred.gif/more fred.gif.more }
