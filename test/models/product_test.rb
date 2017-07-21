@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class ProductTest < ActiveSupport::TestCase
+  fixtures :products
+
   test "product attributes must not be empty" do
     product = Product.new
     assert product.invalid?
@@ -18,6 +20,11 @@ class ProductTest < ActiveSupport::TestCase
     product.price = -1
     assert product.invalid?
     assert_equal ["must be greater than or equal to 0.01"], product.errors[:price]
+
+    product.price = 0
+    assert product.invalid?
+    assert_equal ["must be greater than or equal to 0.01"], product.errors[:price]
+
     product.price = 1
     assert product.valid?
   end
@@ -45,13 +52,14 @@ class ProductTest < ActiveSupport::TestCase
   end
 
   test "product is not valid without a unique title" do
-    product = Product.new(title: products(:one).title,
+    product = Product.new(title: products(:ruby).title,
                           description: 'Blah',
                           image_url: 'yyy.png',
                           price: 1)
 
     assert product.invalid?
     assert ["has already been taken"], product.errors[:title]
+    assert [I18n.translate('errors.messages.taken')], product.errors[:title]
   end
 
 
