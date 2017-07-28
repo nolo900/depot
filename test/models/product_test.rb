@@ -12,7 +12,6 @@ class ProductTest < ActiveSupport::TestCase
     assert product.errors[:price].any?
   end
 
-
   test "product price must be positive" do
     product = Product.new(title: 'My Book',
                           description: 'yyyyy',
@@ -61,7 +60,5 @@ class ProductTest < ActiveSupport::TestCase
     assert ["has already been taken"], product.errors[:title]
     assert [I18n.translate('errors.messages.taken')], product.errors[:title]
   end
-
-
 
 end
