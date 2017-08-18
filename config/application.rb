@@ -11,5 +11,8 @@ module Depot
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = { :address => "localhost", :port => 1025 }
+
   end
 end
