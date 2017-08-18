@@ -1,0 +1,8 @@
+Dear <%= @order.name %>,
+
+
+The items items were shipped on <%= @order.ship_date %>:
+
+<%= render @order.line_items %>
+
+Thanks for your purchase!

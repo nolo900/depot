@@ -2,6 +2,7 @@ require 'test_helper'
 
 class UserStoriesTest < ActionDispatch::IntegrationTest
   fixtures :products
+  fixtures :orders
   include ActiveJob::TestHelper
 
   test "buying a product" do
@@ -29,7 +30,7 @@ class UserStoriesTest < ActionDispatch::IntegrationTest
           order: {
               name: 'Dave Thomas',
               address: '123 Main Street',
-              email: 'dave@example.com',
+              email: 'dave@example.org',
               pay_type: 'Check'
           }
       }
@@ -46,7 +47,7 @@ class UserStoriesTest < ActionDispatch::IntegrationTest
 
       assert_equal 'Dave Thomas', order.name
       assert_equal '123 Main Street', order.address
-      assert_equal 'dave@example.com', order.email
+      assert_equal 'dave@example.org', order.email
       assert_equal 'Check', order.pay_type
 
       assert_equal 1, order.line_items.size
@@ -54,12 +55,37 @@ class UserStoriesTest < ActionDispatch::IntegrationTest
       assert_equal ruby_book, line_item.product
 
       mail = ActionMailer::Base.deliveries.last
-      assert_equal ["dave@example.com"], mail.to
+      assert_equal ["dave@example.org"], mail.to
       assert_equal 'Sam Ruby <depot@example.com>', mail[:from].value
       assert_equal 'Order Confirmation', mail.subject
     end
 
   end
 
+  test "update ship date" do
+    order = orders(:one)
+
+    get '/orders'
+    assert_response :success
+    assert_select 'h1', 'Orders'
+
+    get "/orders/#{order.id}/edit"
+    assert_response :success
+    assert_select 'h1', 'Editing Order'
+
+    perform_enqueued_jobs do
+      patch "/orders/#{order.id}", params: {order: {id: order.id, ship_date: '2017-01-01'} }
+      assert_response :redirect
+      follow_redirect!
+      assert_response :success
+      assert_select 'p', 'Order was successfully updated.'
+
+      mail = ActionMailer::Base.deliveries.last
+      assert_equal ["dave@example.org"], mail.to
+      assert_equal 'Sam Ruby <depot@example.com>', mail[:from].value
+      assert_equal 'Shipment Update', mail.subject
+    end
+
+  end
 
 end
